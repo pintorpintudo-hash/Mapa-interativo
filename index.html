@@ -15,13 +15,13 @@
     /* LAYOUT CELULAR (Padrão) */
     #map {
       width: 100vw;
-      height: calc(100vh - 140px); /* Mapa ocupa toda a tela menos 140px */
-      background-color: #e5e5e5;
+      height: calc(100vh - 140px);
+      background-color: #ffffff;
     }
     
     #sidebar {
       width: 100vw;
-      height: 140px; /* Barra inferior fixa e pequena */
+      height: 140px;
       background: #ffffff;
       border-top: 2px solid #ccc;
       overflow-y: auto;
@@ -31,7 +31,7 @@
       z-index: 1000;
     }
 
-    /* LAYOUT COMPUTADOR (Telas maiores que 768px) */
+    /* LAYOUT COMPUTADOR */
     @media (min-width: 768px) {
       #sidebar {
         width: 300px;
@@ -51,7 +51,6 @@
       }
     }
 
-    /* Estilos da Barra Lateral / Inferior */
     .sidebar-header {
       padding: 10px;
       background: #2c3e50;
@@ -86,13 +85,11 @@
 </head>
 <body>
 
-  <!-- BARRA LATERAL (Fica embaixo no celular) -->
   <div id="sidebar">
     <div class="sidebar-header">Registros no Mapa</div>
     <div id="lista-marcacoes"></div>
   </div>
 
-  <!-- MAPA -->
   <div id="map"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -100,7 +97,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
   <script>
-    // 1. DICIONÁRIO DOS SEUS ARQUIVOS PNG
     const CATEGORIAS = {
       "1": { nome: "Igreja", arquivo: "igreja.png" },
       "2": { nome: "Aluguel", arquivo: "aluguel.png" },
@@ -111,38 +107,41 @@
       "7": { nome: "Ponto de Ônibus", arquivo: "ponto-de-onibus.png" }
     };
 
-    // 2. CONFIGURAÇÃO DO FIREBASE (Cole suas chaves aqui)
+    // Suas credenciais oficiais do Firebase integradas:
     const firebaseConfig = {
-      apiKey: "SUA_API_KEY",
-      authDomain: "SEU_PROJETO.firebaseapp.com",
-      databaseURL: "https://SEU_PROJETO-default-rtdb.firebaseio.com",
-      projectId: "SEU_PROJETO",
-      storageBucket: "SEU_PROJETO.appspot.com",
-      messagingSenderId: "SEU_SENDER_ID",
-      appId: "SEU_APP_ID"
+      apiKey: "AIzaSyB1YIrtkBJWjeEGAkdZ7g3jpTo642P61gM",
+      authDomain: "mapa-interativo-odonto.firebaseapp.com",
+      databaseURL: "https://mapa-interativo-odonto-default-rtdb.firebaseio.com",
+      projectId: "mapa-interativo-odonto",
+      storageBucket: "mapa-interativo-odonto.firebasestorage.app",
+      messagingSenderId: "336573426093",
+      appId: "1:336573426093:web:c5bf663dc02df19869d924",
+      measurementId: "G-B811VWMKXB"
     };
 
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
     const marcacoesRef = database.ref('marcacoes');
 
-    // 3. INICIALIZAR O MAPA
-    const map = L.map('map', { crs: L.CRS.Simple, minZoom: -1 });
-    const limites = [[0, 0], [1000, 1000]]; // Tamanho virtual da imagem
+    const map = L.map('map', { 
+      crs: L.CRS.Simple, 
+      minZoom: 0,
+      maxBoundsViscosity: 1.0
+    });
+    const limites = [[0, 0], [1000, 1000]];
+    map.setMaxBounds(limites);
     L.imageOverlay('mapa.png', limites).addTo(map);
     map.fitBounds(limites);
 
-    // Cria o ícone para o mapa
     function criarIcone(caminhoPng) {
       return L.icon({
         iconUrl: caminhoPng,
         iconSize: [32, 32],
-        iconAnchor: [16, 32], // A base da imagem aponta para o local clicado
+        iconAnchor: [16, 32],
         popupAnchor: [0, -32]
       });
     }
 
-    // 4. ADICIONAR MARCAÇÃO AO CLICAR
     map.on('click', function(e) {
       const autor = prompt("Qual o seu nome?");
       if (!autor) return;
@@ -166,7 +165,6 @@
       const descricao = prompt("Digite uma descrição curta (ex: Aluga-se kitnet):");
       if (!descricao) return;
 
-      // Envia para o Firebase
       marcacoesRef.push({
         lat: e.latlng.lat,
         lng: e.latlng.lng,
@@ -178,7 +176,6 @@
 
     const marcadoresLocais = {};
 
-    // 5. SINCRONIZAR COM O BANCO DE DADOS (Mostra na tela)
     marcacoesRef.on('child_added', function(snapshot) {
       const id = snapshot.key;
       const data = snapshot.val();
@@ -186,12 +183,10 @@
       const categoria = CATEGORIAS[data.categoriaId] || CATEGORIAS["1"];
       const caminhoImagem = categoria.arquivo;
 
-      // Adiciona o PNG no Mapa
       const marker = L.marker([data.lat, data.lng], {
         icon: criarIcone(caminhoImagem)
       }).addTo(map);
 
-      // Caixa de texto do Mapa
       marker.bindPopup(`
         <div style="text-align: center;">
           <img src="${caminhoImagem}" style="width:30px; height:30px;"><br>
@@ -204,7 +199,6 @@
 
       marcadoresLocais[id] = marker;
 
-      // Adiciona na Barra Lateral
       const item = document.createElement('div');
       item.className = 'item-marcacao';
       item.id = 'item-' + id;
@@ -216,16 +210,14 @@
         </div>
       `;
 
-      // Clicar na barra lateral centraliza o mapa
       item.onclick = function() {
-        map.setView([data.lat, data.lng], 1); // 1 é o nível de zoom
+        map.setView([data.lat, data.lng], 1);
         marker.openPopup();
       };
 
       document.getElementById('lista-marcacoes').appendChild(item);
     });
 
-    // 6. REMOVER MARCAÇÕES
     marcacoesRef.on('child_removed', function(snapshot) {
       const id = snapshot.key;
       if (marcadoresLocais[id]) {
