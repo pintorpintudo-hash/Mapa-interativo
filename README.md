@@ -1,6 +1,6 @@
 # Mapa-interativo
 Criado para a uso unicamente da USP
-
+https://odonto-usp.github.io/Mapa-interativo/?hl=pt-BR
 ## 🎨 Como Alterar ou Adicionar Novos Ícones (.png)
 
 Siga o passo a passo abaixo para incluir novas marcações ou substituir os símbolos existentes no mapa:
