@@ -107,7 +107,6 @@
       "7": { nome: "Ponto de Ônibus", arquivo: "ponto-de-onibus.png" }
     };
 
-    // Suas credenciais oficiais do Firebase integradas:
     const firebaseConfig = {
       apiKey: "AIzaSyB1YIrtkBJWjeEGAkdZ7g3jpTo642P61gM",
       authDomain: "mapa-interativo-odonto.firebaseapp.com",
@@ -123,12 +122,15 @@
     const database = firebase.database();
     const marcacoesRef = database.ref('marcacoes');
 
+    // Inicialização ajustada para a proporção exata da nova imagem
     const map = L.map('map', { 
       crs: L.CRS.Simple, 
-      minZoom: 0,
+      minZoom: -2,
       maxBoundsViscosity: 1.0
     });
-    const limites = [[0, 0], [1000, 1000]];
+    
+    // Limites proporcionais: [Altura (2480px), Largura (3510px)]
+    const limites = [[0, 0], [2480, 3510]];
     map.setMaxBounds(limites);
     L.imageOverlay('mapa.png', limites).addTo(map);
     map.fitBounds(limites);
@@ -211,7 +213,7 @@
       `;
 
       item.onclick = function() {
-        map.setView([data.lat, data.lng], 1);
+        map.setView([data.lat, data.lng], 0);
         marker.openPopup();
       };
 
