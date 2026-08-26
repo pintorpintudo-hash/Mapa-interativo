@@ -97,14 +97,31 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
   <script>
+    // NOMES DAS IMAGENS DOS ÍCONES QUE DEVEM ESTAR NO SEU GITHUB:
+    // - mapa.png (Imagem de fundo do mapa em 3510x2480px)
+    // - acidente-eletrico.png
+    // - aluguel.png
+    // - buraco.png
+    // - cabelereiro.png
+    // - calcada-torta.png
+    // - comercio.png
+    // - dengue.png
+    // - faixa-de-pedestre.png
+    // - igreja.png
+    // - ponto-de-onibus.png
+
+    // 1. DICIONÁRIO EM ORDEM ALFABÉTICA
     const CATEGORIAS = {
-      "1": { nome: "Igreja", arquivo: "igreja.png" },
+      "1": { nome: "Acidente Elétrico", arquivo: "acidente-eletrico.png" },
       "2": { nome: "Aluguel", arquivo: "aluguel.png" },
-      "3": { nome: "Cabeleireiro", arquivo: "cabelereiro.png" },
-      "4": { nome: "Faixa de Pedestre", arquivo: "faixa-de-pedestre.png" },
-      "5": { nome: "Acidente Elétrico", arquivo: "acidente-eletrico.png" },
-      "6": { nome: "Dengue", arquivo: "dengue.png" },
-      "7": { nome: "Ponto de Ônibus", arquivo: "ponto-de-onibus.png" }
+      "3": { nome: "Buraco", arquivo: "buraco.png" },
+      "4": { nome: "Cabeleireiro", arquivo: "cabelereiro.png" },
+      "5": { nome: "Calçada Torta", arquivo: "calcada-torta.png" },
+      "6": { nome: "Comércio", arquivo: "comercio.png" },
+      "7": { nome: "Dengue", arquivo: "dengue.png" },
+      "8": { nome: "Faixa de Pedestre", arquivo: "faixa-de-pedestre.png" },
+      "9": { nome: "Igreja", arquivo: "igreja.png" },
+      "10": { nome: "Ponto de Ônibus", arquivo: "ponto-de-onibus.png" }
     };
 
     const firebaseConfig = {
@@ -122,14 +139,12 @@
     const database = firebase.database();
     const marcacoesRef = database.ref('marcacoes');
 
-    // Inicialização ajustada para a proporção exata da nova imagem
     const map = L.map('map', { 
       crs: L.CRS.Simple, 
       minZoom: -2,
       maxBoundsViscosity: 1.0
     });
     
-    // Limites proporcionais: [Altura (2480px), Largura (3510px)]
     const limites = [[0, 0], [2480, 3510]];
     map.setMaxBounds(limites);
     L.imageOverlay('mapa.png', limites).addTo(map);
@@ -150,13 +165,16 @@
 
       const menuTexto = 
         "Escolha o NÚMERO da categoria:\n\n" +
-        "1 - Igreja\n" +
+        "1 - Acidente Elétrico\n" +
         "2 - Aluguel\n" +
-        "3 - Cabeleireiro\n" +
-        "4 - Faixa de Pedestre\n" +
-        "5 - Acidente Elétrico\n" +
-        "6 - Dengue\n" +
-        "7 - Ponto de Ônibus";
+        "3 - Buraco\n" +
+        "4 - Cabeleireiro\n" +
+        "5 - Calçada Torta\n" +
+        "6 - Comércio\n" +
+        "7 - Dengue\n" +
+        "8 - Faixa de Pedestre\n" +
+        "9 - Igreja\n" +
+        "10 - Ponto de Ônibus";
 
       const opcao = prompt(menuTexto, "1");
       if (!CATEGORIAS[opcao]) {
@@ -164,7 +182,7 @@
         return;
       }
 
-      const descricao = prompt("Digite uma descrição curta (ex: Aluga-se kitnet):");
+      const descricao = prompt("Digite uma descrição curta:");
       if (!descricao) return;
 
       marcacoesRef.push({
